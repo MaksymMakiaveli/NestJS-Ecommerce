@@ -1,9 +1,19 @@
-import { Module } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  MiddlewareConsumer,
+  Module,
+} from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './config';
-import { UsersModule } from './users/users.module';
+import { UsersModule } from './users';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { JwtGuard } from './common/guards';
+import { ResponseInterceptor } from './common/interceptors';
+import { GlobalExceptionFilter } from './common/filters';
+import { LogsMiddleware } from './common/middlewares';
+import { AuthModule } from './auth';
 
 @Module({
   imports: [
@@ -25,8 +35,30 @@ import { UsersModule } from './users/users.module';
       useFactory: typeOrmConfig,
     }),
     UsersModule,
+    AuthModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ClassSerializerInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionFilter,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LogsMiddleware).forRoutes('*');
+  }
+}
