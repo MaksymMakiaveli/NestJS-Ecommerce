@@ -1,10 +1,10 @@
 import { Column, Entity } from 'typeorm';
-import { BaseEntity } from '../../shared/dataObjects';
+import { BaseEntity } from '../../shared';
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 
-@Entity()
-export class User extends BaseEntity {
+@Entity('user')
+export class UserEntity extends BaseEntity {
   @ApiProperty()
   @Column({
     unique: true,
