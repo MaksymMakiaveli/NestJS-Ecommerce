@@ -14,6 +14,8 @@ import { ResponseInterceptor } from './common/interceptors';
 import { GlobalExceptionFilter } from './common/filters';
 import { LogsMiddleware } from './common/middlewares';
 import { AuthModule } from './auth';
+import { ProductModule } from './product';
+import { CategoryModule } from './category';
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { AuthModule } from './auth';
     }),
     UsersModule,
     AuthModule,
+    ProductModule,
+    CategoryModule,
   ],
   controllers: [],
   providers: [
